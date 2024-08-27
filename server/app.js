@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const fs = require("fs/promises");
-const { getTopics } = require("../controllers/topics.controller");
+const { getTopics, getApis } = require("../controllers/topics.controller");
 const {
   psqlErrorHandler,
   customErrorHandler,
@@ -11,8 +11,10 @@ app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
+app.get("/api", getApis);
+
 app.all("/*", (req, res) => {
-  res.status(404).send({ msg: "Route not found" });
+  res.status(404).send({ message: "Route not found" });
 });
 
 app.use(psqlErrorHandler);

@@ -6,9 +6,9 @@ To run this project locally,
 
 1: create two files in the root directory (bc-nc-news) - ".env.test" & ".env.development"
 
-2: In .env.test PASTE -----> PGDATABASE=nc_news_test
+2: In .env.test PASTE -----> PGDATABASE=<test-database-name>
 
-3: In .env.development PASTE -----> PGDATABASE=nc_news
+3: In .env.development PASTE -----> PGDATABASE=<database-name>
 
 ---
 
