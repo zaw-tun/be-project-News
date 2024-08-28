@@ -117,3 +117,48 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  it("status: 200, responds with all comments received for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: comments }) => {
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  it("status: 200, responds with empty array when article_id exists but has no related comments, responds with empty array", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body: comments }) => {
+        expect(comments).toHaveLength(0);
+        expect(Array.isArray(comments)).toBe(true);
+      });
+  });
+  it("status: 404, responds with an appropriate status and error when given a valid but non-exisitant article_id", () => {
+    return request(app)
+      .get("/api/articles/199/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe("No such article_id yet");
+      });
+  });
+  it("status:400, responds with an appropriate status and error when given an invalid id", () => {
+    return request(app)
+      .get("/api/articles/apple/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("Invalid data type provided");
+      });
+  });
+});
