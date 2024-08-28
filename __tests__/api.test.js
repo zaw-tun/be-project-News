@@ -124,7 +124,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: comments }) => {
-        console.log(comments);
         expect(comments).toHaveLength(11);
         comments.forEach((comment) => {
           expect(comment).toHaveProperty("comment_id");
