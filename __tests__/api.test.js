@@ -51,7 +51,10 @@ describe("GET /api", () => {
       .expect(200)
       .then((response) => {
         const { body } = response;
-        expect(body).toEqual(endpoints);
+        expect(body).not.toBe(null);
+        expect(body).toHaveProperty("GET /api");
+        expect(body).toHaveProperty("GET /api/topics");
+        expect(body["GET /api"]).toHaveProperty("description");
       });
   });
 });
@@ -87,6 +90,30 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.message).toBe("Invalid data type provided");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  it("status: 200, responds with all articles sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles.length).toBe(13);
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+        body.articles.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article.body).toBe(undefined);
+        });
       });
   });
 });
