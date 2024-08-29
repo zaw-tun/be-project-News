@@ -162,3 +162,60 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("/POST /api/articles/:article_id/comments", () => {
+  const newComment = {
+    username: "rogersop",
+    body: "This is a 1st test article",
+  };
+  it("status:201, adds a comment with username and body to the given article and responds with posted comment", () => {
+    return request(app)
+      .post("/api/articles/10/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body.comment.article_id).toBe(10);
+      });
+  });
+
+  it("status:201, adds a comment with another username and body to the given article and responds with posted comment", () => {
+    return request(app)
+      .post("/api/articles/10/comments")
+      .send({
+        username: "lurker",
+        body: "This is a 2nd test article",
+      })
+      .expect(201)
+      .then((response) => {
+        expect(response.body.comment.article_id).toBe(10);
+      });
+  });
+
+  it("status:400, responds with an appropriate status and error message when provided with a comment without a username)", () => {
+    return request(app)
+      .post("/api/articles/10/comments")
+      .send({ body: "This is a 3rd test article" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("Invalid data type provided");
+      });
+  });
+  it("status:400, responds with an appropriate status and error message when provided with a comment with a strange (non-existant) username", () => {
+    return request(app)
+      .post("/api/articles/10/comments")
+      .send({ username: "zaw", body: "This is a 4th test article" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("Invalid data type provided");
+      });
+  });
+  it("status:404, responds with an appropriate status and error message when provided with an invalid article_id", () => {
+    return request(app)
+      .post("/api/articles/200/comments")
+      .send(newComment)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe("No such article_id yet");
+      });
+  });
+});
