@@ -74,12 +74,6 @@
           "author": "rogersop",
           "votes": 0,
           "created_at": "2024-08-29T11:57:13.538Z"
-        },
-        {
-          "limit": "limits the number of responses - pagination"
-        },
-        {
-          "p": ["sets the page number - pagination"]
         }
       ]
     }
