@@ -174,7 +174,6 @@ describe("/POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then((response) => {
-        console.log(response.body.comment);
         expect(response.body.comment.article_id).toBe(10);
       });
   });
