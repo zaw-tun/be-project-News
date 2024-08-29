@@ -57,14 +57,29 @@
           "author": "icellusedkars",
           "votes": 0,
           "created_at": "2020-11-03T21:00:00.000Z"
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds a comment with username and body to the given article and responds with posted comment",
+    "queries": ["article_id"],
+    "limitation": "only accept the existing usernames from database, that are ['butter_bridge', 'icellusedkars', 'rogersop', 'lurker']",
+    "exampleResponse": {
+      "articles/1/comments": [
+        {
+          "comment_id": 19,
+          "body": "This is a 1st test article",
+          "article_id": 10,
+          "author": "rogersop",
+          "votes": 0,
+          "created_at": "2024-08-29T11:57:13.538Z"
         },
         {
-          "comment_id": 2,
-          "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
-          "article_id": 1,
-          "author": "butter_bridge",
-          "votes": 14,
-          "created_at": "2020-10-31T03:03:00.000Z"
+          "limit": "limits the number of responses - pagination"
+        },
+        {
+          "p": ["sets the page number - pagination"]
         }
       ]
     }
