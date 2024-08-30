@@ -15,18 +15,53 @@ function selectArticleById(article_id) {
     });
 }
 
-function selectArticles() {
-  return db
-    .query(
-      `
-        SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, COUNT(c.comment_id) AS comment_count FROM articles AS a
+function selectArticles(sort_by, order) {
+  let queryStr = `SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, COUNT(c.comment_id) AS comment_count FROM articles AS a
         LEFT JOIN comments AS c USING (article_id)
-        GROUP BY a.article_id ORDER BY a.created_at DESC;
-        `
-    )
-    .then((result) => {
-      return result.rows;
-    });
+        GROUP BY a.article_id`;
+
+  const validSorts = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+  const validOrder = ["ASC", "DESC"];
+
+  if (sort_by) {
+    if (!validSorts.includes(sort_by)) {
+      return Promise.reject({
+        status: 400,
+        message: "Invalid sort column.",
+      });
+    } else {
+      queryStr += ` ORDER BY ${sort_by}`;
+    }
+  } else {
+    queryStr += ` ORDER BY a.created_at`;
+  }
+
+  if (order) {
+    if (!validOrder.includes(order)) {
+      return Promise.reject({
+        status: 400,
+        message:
+          "Invalid Order value. Please choose from {ASC: ascending, DESC: descending}",
+      });
+    } else {
+      queryStr += ` ${order};`;
+    }
+  } else {
+    queryStr += ` DESC;`;
+  }
+
+  return db.query(queryStr).then((result) => {
+    return result.rows;
+  });
 }
 
 function selectCommentsByArticleId(article_id) {
@@ -73,7 +108,7 @@ function insertCommentById(article_id, username, body) {
 
 function incVotesById(article_id, inc_votes) {
   return selectArticleById(article_id).then((data) => {
-    if (isNaN(inc_votes)) {
+    if (typeof inc_votes !== "number") {
       return Promise.reject({
         status: 400,
         message: "Cannot update. Invalid data.",
@@ -99,7 +134,7 @@ function deleteComment(comment_id) {
       if (data.rows.length === 0) {
         return Promise.reject({
           status: 404,
-          message: "No such comment_id exist yet",
+          message: "No comment with specified comment_id.",
         });
       }
       return db
@@ -109,7 +144,7 @@ function deleteComment(comment_id) {
           [comment_id]
         )
         .then((data) => {
-          return data.rows[0];
+          return data.rows;
         });
     });
 }
