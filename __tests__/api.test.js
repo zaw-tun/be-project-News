@@ -254,3 +254,22 @@ describe("/PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("/DELETE /api/comments/:comment_id", () => {
+  it("status:204, responds with no content", () => {
+    return request(app)
+      .delete("/api/comments/13")
+      .expect(204)
+      .then((response) => {
+        expect(response.body).toEqual({});
+      });
+  });
+  it("status:404, responds with no content", () => {
+    return request(app)
+      .delete("/api/comments/100")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe("No such comment_id exist yet");
+      });
+  });
+});
