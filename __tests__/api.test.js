@@ -81,7 +81,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/999")
       .expect(404)
       .then((response) => {
-        expect(response.body.message).toBe("ID doesn't exist yet");
+        expect(response.body.message).toBe("No such article_id exist yet");
       });
   });
   it("status: 400, responds with an appropriate status and error message when given an invalid id", () => {
@@ -216,6 +216,41 @@ describe("/POST /api/articles/:article_id/comments", () => {
       .expect(404)
       .then((response) => {
         expect(response.body.message).toBe("No such article_id yet");
+      });
+  });
+});
+
+describe("/PATCH /api/articles/:article_id", () => {
+  const updateVotes = {
+    inc_votes: 10,
+  };
+  it("status:200, responds with updated article", () => {
+    return request(app)
+      .patch("/api/articles/5")
+      .send(updateVotes)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article.article_id).toBe(5);
+        expect(response.body.article.votes).toBe(10);
+      });
+  });
+  it("status: 404, responds with an appropriate status and error when given a valid but non-exisitant article_id", () => {
+    return request(app)
+      .patch("/api/articles/104")
+      .send(updateVotes)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe("No such article_id exist yet");
+      });
+  });
+  it("status: 400, responds with an appropriate status and error when given invalid datatype for votes", () => {
+    const falseVote = { inc_votes: "not-a-num" };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(falseVote)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("Cannot update. Invalid data.");
       });
   });
 });
