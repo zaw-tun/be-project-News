@@ -116,6 +116,53 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  it("status: 200, responds with all articles sorted by author in descending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+  it("status: 200, responds with all articles sorted in created_at in ascending order", () => {
+    return request(app)
+      .get("/api/articles?order=ASC")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeSortedBy("created_at", { descending: false });
+      });
+  });
+  it("status: 200, responds with all articles sorted by votes in ascending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=ASC")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeSortedBy("votes", { descending: false });
+      });
+  });
+  it("status: 400, responds with an appropriate status and error message when sort_by value is not valid/accepted", () => {
+    return request(app)
+      .get("/api/articles?sort_by=words")
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        expect(body.message).toBe("Invalid sort column.");
+      });
+  });
+  it("status: 400, responds with an appropriate status and error message when order value is not valid/accepted", () => {
+    return request(app)
+      .get("/api/articles?order=ASCENDING")
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        expect(body.message).toBe(
+          "Invalid Order value. Please choose from {ASC: ascending, DESC: descending}"
+        );
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -221,10 +268,10 @@ describe("/POST /api/articles/:article_id/comments", () => {
 });
 
 describe("/PATCH /api/articles/:article_id", () => {
-  const updateVotes = {
-    inc_votes: 10,
-  };
   it("status:200, responds with updated article", () => {
+    const updateVotes = {
+      inc_votes: 10,
+    };
     return request(app)
       .patch("/api/articles/5")
       .send(updateVotes)
@@ -234,13 +281,39 @@ describe("/PATCH /api/articles/:article_id", () => {
         expect(response.body.article.votes).toBe(10);
       });
   });
+  it("status:200, responds with updated article", () => {
+    const updateVotes = {
+      inc_votes: -100,
+    };
+    return request(app)
+      .patch("/api/articles/10")
+      .send(updateVotes)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article.article_id).toBe(10);
+        expect(response.body.article.votes).toBe(-100);
+      });
+  });
   it("status: 404, responds with an appropriate status and error when given a valid but non-exisitant article_id", () => {
+    const updateVotes = {
+      inc_votes: 10,
+    };
     return request(app)
       .patch("/api/articles/104")
       .send(updateVotes)
       .expect(404)
       .then((response) => {
         expect(response.body.message).toBe("No such article_id exist yet");
+      });
+  });
+  it("status: 400, responds with an appropriate status and error when given invalid datatype for votes", () => {
+    const falseVote = { inc_votes: "" };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(falseVote)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("Cannot update. Invalid data.");
       });
   });
   it("status: 400, responds with an appropriate status and error when given invalid datatype for votes", () => {
@@ -269,7 +342,17 @@ describe("/DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/100")
       .expect(404)
       .then((response) => {
-        expect(response.body.message).toBe("No such comment_id exist yet");
+        expect(response.body.message).toBe(
+          "No comment with specified comment_id."
+        );
+      });
+  });
+  it("status:400, responds with an appropriate status and error when given an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("Invalid data type provided");
       });
   });
 });
