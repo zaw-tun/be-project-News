@@ -334,7 +334,6 @@ describe("/DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/13")
       .expect(204)
       .then((response) => {
-        console.log(response);
         expect(response.body).toEqual({});
       });
   });
