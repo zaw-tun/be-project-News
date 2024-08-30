@@ -92,10 +92,33 @@ function incVotesById(article_id, inc_votes) {
   });
 }
 
+function deleteComment(comment_id) {
+  return db
+    .query("SELECT * FROM comments WHERE comment_id = $1;", [comment_id])
+    .then((data) => {
+      if (data.rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "No such comment_id exist yet",
+        });
+      }
+      return db
+        .query(
+          `DELETE FROM comments 
+          WHERE comment_id = $1 RETURNING *;`,
+          [comment_id]
+        )
+        .then((data) => {
+          return data.rows[0];
+        });
+    });
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
   selectCommentsByArticleId,
   insertCommentById,
   incVotesById,
+  deleteComment,
 };
