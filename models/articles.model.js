@@ -1,17 +1,21 @@
+const { patchArticleById } = require("../controllers/articles.controller");
 const db = require("../db/connection");
 
-exports.selectArticleById = (article_id) => {
+function selectArticleById(article_id) {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
     .then((data) => {
       if (data.rows.length === 0) {
-        return Promise.reject({ status: 404, message: "ID doesn't exist yet" });
+        return Promise.reject({
+          status: 404,
+          message: "No such article_id exist yet",
+        });
       }
       return data.rows[0];
     });
-};
+}
 
-exports.selectArticles = () => {
+function selectArticles() {
   return db
     .query(
       `
@@ -23,9 +27,9 @@ exports.selectArticles = () => {
     .then((result) => {
       return result.rows;
     });
-};
+}
 
-exports.selectCommentsByArticleId = (article_id) => {
+function selectCommentsByArticleId(article_id) {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
     .then((data) => {
@@ -44,9 +48,9 @@ exports.selectCommentsByArticleId = (article_id) => {
           return data.rows;
         });
     });
-};
+}
 
-exports.insertCommentById = (article_id, username, body) => {
+function insertCommentById(article_id, username, body) {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
     .then((data) => {
@@ -65,4 +69,33 @@ exports.insertCommentById = (article_id, username, body) => {
           return data.rows[0];
         });
     });
+}
+
+function incVotesById(article_id, inc_votes) {
+  return selectArticleById(article_id).then((data) => {
+    if (isNaN(inc_votes)) {
+      return Promise.reject({
+        status: 400,
+        message: "Cannot update. Invalid data.",
+      });
+    }
+    data.votes += inc_votes;
+    return db
+      .query(
+        `UPDATE articles SET votes = $1 
+        WHERE article_id = $2 RETURNING *;`,
+        [data.votes, article_id]
+      )
+      .then((data) => {
+        return data.rows[0];
+      });
+  });
+}
+
+module.exports = {
+  selectArticleById,
+  selectArticles,
+  selectCommentsByArticleId,
+  insertCommentById,
+  incVotesById,
 };
