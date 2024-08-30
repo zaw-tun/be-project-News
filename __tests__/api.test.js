@@ -250,7 +250,6 @@ describe("/PATCH /api/articles/:article_id", () => {
       .send(falseVote)
       .expect(400)
       .then((response) => {
-        console.log(response);
         expect(response.body.message).toBe("Cannot update. Invalid data.");
       });
   });
