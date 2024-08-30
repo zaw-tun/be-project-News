@@ -114,6 +114,14 @@ function deleteComment(comment_id) {
     });
 }
 
+function selectUsers() {
+  return db
+    .query("SELECT username, name, avatar_url FROM users;")
+    .then((result) => {
+      return result.rows;
+    });
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
@@ -121,4 +129,5 @@ module.exports = {
   insertCommentById,
   incVotesById,
   deleteComment,
+  selectUsers,
 };
