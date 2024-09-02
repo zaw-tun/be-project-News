@@ -2,11 +2,11 @@
 
 Instructions:
 
-The news API is hosted here: https://be-project-news-s6g0.onrender.com/
+The news API is hosted here: https://be-project-news-s6g0.onrender.com/api
 
 To run this api locally,
 
-1: create two files in the root directory (bc-nc-news) - ".env.test" & ".env.development"
+1: create two files in the root directory - ".env.test" & ".env.development"
 
 2: In .env.test PASTE -----> PGDATABASE="test-database-name-here"
 
