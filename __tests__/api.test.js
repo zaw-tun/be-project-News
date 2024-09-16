@@ -163,6 +163,17 @@ describe("GET /api/articles", () => {
         );
       });
   });
+  it("status: 200, responds with all articles under the specified topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {

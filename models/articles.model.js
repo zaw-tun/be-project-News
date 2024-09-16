@@ -15,10 +15,9 @@ function selectArticleById(article_id) {
     });
 }
 
-function selectArticles(sort_by, order) {
+function selectArticles(sort_by, order, topic) {
   let queryStr = `SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, COUNT(c.comment_id) AS comment_count FROM articles AS a
-        LEFT JOIN comments AS c USING (article_id)
-        GROUP BY a.article_id`;
+        LEFT JOIN comments AS c USING (article_id)`;
 
   const validSorts = [
     "author",
@@ -31,6 +30,19 @@ function selectArticles(sort_by, order) {
     "comment_count",
   ];
   const validOrder = ["ASC", "DESC"];
+  const validTopics = ["mitch", "cats"];
+
+  queryStr += ` GROUP BY a.article_id`;
+  if (topic) {
+    if (!validTopics.includes(topic)) {
+      return Promise.reject({
+        status: 400,
+        message: "Invalid topic.",
+      });
+    } else {
+      queryStr += ` HAVING a.topic = '${topic}'`;
+    }
+  }
 
   if (sort_by) {
     if (!validSorts.includes(sort_by)) {
