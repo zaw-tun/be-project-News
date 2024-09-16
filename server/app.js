@@ -1,5 +1,7 @@
+const cors = require("cors");
 const express = require("express");
 const app = express();
+app.use(cors());
 const fs = require("fs/promises");
 const { getTopics, getApis } = require("../controllers/topics.controller");
 const {
