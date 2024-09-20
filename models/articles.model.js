@@ -30,7 +30,7 @@ function selectArticles(sort_by, order, topic) {
     "comment_count",
   ];
   const validOrder = ["ASC", "DESC"];
-  const validTopics = ["mitch", "cats"];
+  const validTopics = ["mitch", "cats", "coding", "football", "cooking"];
 
   queryStr += ` GROUP BY a.article_id`;
   if (topic) {
